@@ -17,7 +17,10 @@ function Get-RcloneConfigFile() {
         return $false
     }
 
-    $Env:RCLONE_CONFIG.Replace("\n", "`r`n") | Out-File $RCLONE_CONFIG_FILE
+    $contents = [Convert]::FromBase64String($Env:RCLONE_CONFIG_CONTENTS)
+    $contents = [System.Text.Encoding]::Unicode.GetString($contents)
+    $contents | Out-File $RCLONE_CONFIG_FILE
+
     return $true
 }
 
@@ -57,12 +60,18 @@ if (-not (Get-Rclone)) {
     })
 }
 
-# Copy the configuration from the environment variable RCLONE_CONFIG to the file $RCLONE_CONFIG_FILE.
-# The config file is still not used by rclone.
+# Copy the configuration from the environment variable RCLONE_CONFIG_CONTENTS to the file $RCLONE_CONFIG_FILE.
 Get-RcloneConfigFile
-$rclone_cmd = "$RCLONE_CMD config file"
+$tmp = New-TemporaryFile
+$RCLONE_LOG = $tmp.name
+
+$rclone_cmd = "$RCLONE_CMD sync 'GDrive:Important Documents' Azure:importantdocuments --log-level INFO --log-file $RCLONE_LOG --config=$RCLONE_CONFIG_FILE"
 $body = "Executing $rclone_cmd`r`n"
-$body += Invoke-Expression $rclone_cmd
+$res = Invoke-Expression $rclone_cmd
+$body += $res
+$body += Get-Content $RCLONE_LOG -Raw
+Remove-Item $RCLONE_LOG
+Remove-Item $RCLONE_CONFIG_FILE
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 
