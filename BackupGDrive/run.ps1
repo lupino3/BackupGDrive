@@ -48,7 +48,7 @@ function Get-Rclone() {
 }
 
 if (-not (Get-Rclone)) {
-    $body = "Couldn't downlaod rclone, exiting."
+    $body = "Couldn't download rclone, exiting."
     Write-Host $body
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
