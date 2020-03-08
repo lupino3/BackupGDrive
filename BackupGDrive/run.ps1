@@ -1,7 +1,6 @@
 using namespace System.Net
 
-# Input bindings are passed in via param block.
-param($Request, $TriggerMetadata)
+param($Timer)
 
 # Write to the Azure Functions log stream.
 Write-Host "BackupGDrive Function Invoked."
@@ -54,10 +53,7 @@ if (-not (Get-Rclone)) {
     $body = "Couldn't download rclone, exiting."
     Write-Host $body
 
-    Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
-        StatusCode = [HttpStatusCode]::ServiceUnavailable
-        Body = $body
-    })
+    return
 }
 
 # Copy the configuration from the environment variable RCLONE_CONFIG_CONTENTS to the file $RCLONE_CONFIG_FILE.
@@ -73,9 +69,4 @@ $body += Get-Content $RCLONE_LOG -Raw
 Remove-Item $RCLONE_LOG
 Remove-Item $RCLONE_CONFIG_FILE
 
-# Associate values to output bindings by calling 'Push-OutputBinding'.
-
-Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
-    StatusCode = [HttpStatusCode]::OK
-    Body = $body
-})
+Write-Host $body
