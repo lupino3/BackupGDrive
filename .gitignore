@@ -7,3 +7,8 @@ local.settings.json
 
 # rclone binary
 rclone.exe
+
+# Vim files
+*~
+*.swp
+*.swo
