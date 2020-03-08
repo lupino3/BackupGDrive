@@ -2,7 +2,7 @@ param(
     [string] $ResourceGroup,
     [string] $AppName,
     [string] $ConfigFile,
-    [string] $VariableName = "RCLONE_CONFIG"
+    [string] $VariableName = "RCLONE_CONFIG_CONTENTS"
 )
 
 $ErrorActionPreference = "Stop"

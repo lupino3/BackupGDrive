@@ -12,7 +12,7 @@ $RCLONE_CMD = "$PSScriptRoot\rclone.exe"
 $RCLONE_CONFIG_FILE = "$PSScriptRoot\rclone.cfg"
 
 function Get-RcloneConfigFile() {
-    if ([string]::IsNullOrWhiteSpace($Env:RCLONE_CONFIG)) {
+    if ([string]::IsNullOrWhiteSpace($Env:RCLONE_CONFIG_CONTENTS)) {
         Write-Host "The RCLONE_CONFIG environment variable, which should contain the rclone config, is empty."
         return $false
     }
@@ -60,8 +60,9 @@ if (-not (Get-Rclone)) {
 # Copy the configuration from the environment variable RCLONE_CONFIG to the file $RCLONE_CONFIG_FILE.
 # The config file is still not used by rclone.
 Get-RcloneConfigFile
-
-$body = Invoke-Expression "$RCLONE_CMD config file"
+$rclone_cmd = "$RCLONE_CMD config file"
+$body = "Executing $rclone_cmd`r`n"
+$body += Invoke-Expression $rclone_cmd
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 
