@@ -7,6 +7,10 @@ param(
     [ValidateNotNullOrEmpty()]
     [string] $RclonePath = "$PSScriptRoot\rclone.exe",
 
+    [Parameter(HelpMessage="Path to the rclone config file")]
+    [ValidateNotNullOrEmpty()]
+    [string] $RcloneConfig = "$env:APPDATA\rclone\rclone.conf",
+
     [Parameter(HelpMessage="Set to true if rclone should be downloaded if missing")]
     [switch]
     $ShouldDownloadRclone = $false,
@@ -25,22 +29,29 @@ $backups = @(
 )
 
 # Validation and setup.
+if (-not (Test-Path $RCloneConfig)) {
+    Write-Error "Could not find the RClone config at $RCloneConfig"
+    exit
+}
 if (-not (Test-Path $RClonePath)) {
     if (-not $ShouldDownloadRclone) {
         Write-Error "Could not find the RClone binary at $RClonePath"
         exit
     }
     $RcloneUri = "https://downloads.rclone.org/rclone-current-windows-amd64.zip" 
-    Write-Output "Could not find the RClone binary at $RClonePath RClone. Downloading it as requested, from $RcloneUri"
+    Write-Output "Could not find the RClone binary at $RClonePath. Downloading it as requested, from $RcloneUri"
     Invoke-WebRequest -Uri $RcloneUri -OutFile $env:TMP\rclone.zip
     Expand-Archive -Force $env:TMP\rclone.zip -DestinationPath $env:TMP
     $RclonePath = Get-ChildItem -Path $env:TMP\rclone-v*-windows-amd64\rclone.exe
     Write-Debug "Overriding Rclone path to $RclonePath"
 }
 
+# Common rclone parameters.
+$rcloneParams = "-P --checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfig"
+
 # TODO: get the necessary remotes from Source/Destination.
 $necessaryRemotes = @("Azure:", "GDrive:")
-$remotes = Invoke-Expression "$RClonePath listremotes"
+$remotes = Invoke-Expression "$RClonePath listremotes $rcloneParams"
 $ok = $true
 $necessaryRemotes | % {
     if (-not ($remotes -contains $_)) {
@@ -58,9 +69,6 @@ $categories = @("documents")
 if ($BackupPhotos) {
     $categories = @("documents";"photos")
 }
-
-# Script currently used for manual backups. Assumes that rclone is available in the directory of the script and configured.
-$rcloneParams = "-P --checkers=$RcloneCheckers --transfers=$RcloneTransfers"
 
 $backups | ForEach-Object {
     if (-not ($categories -icontains $_.Category)) {
