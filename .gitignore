@@ -5,8 +5,9 @@ obj
 appsettings.json
 local.settings.json
 
-# rclone binary
+# rclone binary and config
 rclone.exe
+rclone.conf
 
 # Vim files
 *~
