@@ -7,6 +7,10 @@ param(
     [ValidateNotNullOrEmpty()]
     [string] $RclonePath = "$PSScriptRoot\rclone.exe",
 
+    [Parameter(HelpMessage="Set to true if rclone should be downloaded if missing")]
+    [switch]
+    $ShouldDownloadRclone = $false,
+
     # Rclone options.
     [int]$RcloneCheckers = 5,
     [int]$RcloneTransfers = 5
@@ -22,8 +26,16 @@ $backups = @(
 
 # Validation and setup.
 if (-not (Test-Path $RClonePath)) {
-    Write-Error "Could not find the RClone binary at $RClonePath"
-    exit
+    if (-not $ShouldDownloadRclone) {
+        Write-Error "Could not find the RClone binary at $RClonePath"
+        exit
+    }
+    $RcloneUri = "https://downloads.rclone.org/rclone-current-windows-amd64.zip" 
+    Write-Output "Could not find the RClone binary at $RClonePath RClone. Downloading it as requested, from $RcloneUri"
+    Invoke-WebRequest -Uri $RcloneUri -OutFile $PSScriptRoot\rclone.zip
+    Expand-Archive -Force $PSScriptRoot\rclone.zip
+    $RclonePath = Get-ChildItem -Path rclone\rclone-v*\rclone.exe
+    Write-Debug "Overriding Rclone path to $RclonePath"
 }
 
 # TODO: get the necessary remotes from Source/Destination.
