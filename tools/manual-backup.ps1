@@ -32,9 +32,9 @@ if (-not (Test-Path $RClonePath)) {
     }
     $RcloneUri = "https://downloads.rclone.org/rclone-current-windows-amd64.zip" 
     Write-Output "Could not find the RClone binary at $RClonePath RClone. Downloading it as requested, from $RcloneUri"
-    Invoke-WebRequest -Uri $RcloneUri -OutFile $PSScriptRoot\rclone.zip
-    Expand-Archive -Force $PSScriptRoot\rclone.zip
-    $RclonePath = Get-ChildItem -Path rclone\rclone-v*\rclone.exe
+    Invoke-WebRequest -Uri $RcloneUri -OutFile $env:TMP\rclone.zip
+    Expand-Archive -Force $env:TMP\rclone.zip -DestinationPath $env:TMP
+    $RclonePath = Get-ChildItem -Path $env:TMP\rclone-v*-windows-amd64\rclone.exe
     Write-Debug "Overriding Rclone path to $RclonePath"
 }
 
