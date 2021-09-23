@@ -71,27 +71,35 @@ namespace BackupGDrive
 
     public class ManualBackup
     {
-
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(o => { InnerMain(o); });
+                .WithParsed(o => { var run = new ManualBackupRun(o); run.Run(); });
+        }
+    }
+
+    class ManualBackupRun
+    {
+        private readonly Options options;
+        public ManualBackupRun(Options options)
+        {
+            this.options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        private static void InnerMain(Options options)
+        private void Debug(string msg)
         {
-            if (options == null) { throw new ArgumentNullException(nameof(options)); }
-
             if (options.Debug)
             {
-                Console.WriteLine("Debug mode!");
+                Console.WriteLine(msg);
             }
-            Console.WriteLine($"Hello World! {options.RclonePath}");
-            Console.WriteLine($"Hello World! {options.RcloneConfig}");
-            Console.WriteLine($"{options.BackupsToRun}");
+        }
+
+        public void Run()
+        {
+            Debug($"Hello World! {options.RclonePath}{options.RcloneConfig}");
             foreach (var config in options.GetBackupConfigs())
             {
-                Console.WriteLine(config);
+                Debug(config.ToString());
             }
         }
     }
