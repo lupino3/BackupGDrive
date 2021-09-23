@@ -87,8 +87,3 @@ public class ManualBackup {
         }
     }
 }
-
-class BackupRun
-{
-    
-}
