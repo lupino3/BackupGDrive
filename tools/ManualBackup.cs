@@ -24,13 +24,12 @@ namespace BackupGDrive
             SyncPhotos = 8
         }
         public record BackupConfig(string Action, string Source, string Destination);
-        public readonly ReadOnlyDictionary<Configuration, BackupConfig> configs = new(
-            new Dictionary<Configuration, BackupConfig>{
+        public readonly IReadOnlyDictionary<Configuration, BackupConfig> configs = new Dictionary<Configuration, BackupConfig> {
                 {Configuration.SyncDocs,        new BackupConfig("sync", "GDrive:Important Documents",  "Azure:importantdocuments")},
                 {Configuration.LocalCopyDocs,   new BackupConfig("sync", "GDrive:Important Documents",  "d:/Important Documents")},
                 {Configuration.UploadPhotos,    new BackupConfig("copy", "d:/Photos",                   "GDrive:Photos")},
                 {Configuration.SyncPhotos,      new BackupConfig("sync", "GDrive:Photos",               "Azure:photos")}
-        });
+        };
 
         public IEnumerable<BackupConfig> GetBackupConfigs()
         {
