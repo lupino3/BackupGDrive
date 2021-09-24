@@ -5,6 +5,7 @@ using CommandLine;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Spectre.Console;
 
 namespace BackupGDrive
 {
@@ -80,7 +81,7 @@ namespace BackupGDrive
     class ManualBackupRun
     {
         private readonly Options options;
-        public ManualBackupRun(Options options)
+        public ManualBackupRun(in Options options)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
         }
@@ -89,13 +90,13 @@ namespace BackupGDrive
         {
             if (options.Debug)
             {
-                Console.WriteLine(msg);
+                AnsiConsole.Markup(msg);
             }
         }
 
         public void Run()
         {
-            Debug($"Hello World! {options.RclonePath}{options.RcloneConfig}");
+            Debug($"[underline red]Hello World![/] {options.RclonePath}{options.RcloneConfig}");
             foreach (var config in options.GetBackupConfigs())
             {
                 Debug(config.ToString());
