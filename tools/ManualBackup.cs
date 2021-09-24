@@ -1,106 +1,75 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
-using CommandLine;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Spectre.Console;
+using Spectre.Console.Cli;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BackupGDrive
 {
-
-    // TODO: Usage, help for options, error messages for backups-to-run.
-    class Options
+    public class CLIBackup
     {
-        // Types for configuration, to simplify validation.
-        // TODO: move to a config file. An enum here is not the most flexible thing, but I wanted
-        // to play with Flag enums and their support in CommandLineParser.
-        [Flags]
-        public enum Configuration
+        public static int Main(string[] args)
         {
-            SyncDocs = 1,
-            LocalCopyDocs = 2,
-            UploadPhotos = 4,
-            SyncPhotos = 8
-        }
-        public record BackupConfig(string Action, string Source, string Destination);
-        public readonly IReadOnlyDictionary<Configuration, BackupConfig> configs = new Dictionary<Configuration, BackupConfig> {
-                {Configuration.SyncDocs,        new BackupConfig("sync", "GDrive:Important Documents",  "Azure:importantdocuments")},
-                {Configuration.LocalCopyDocs,   new BackupConfig("sync", "GDrive:Important Documents",  "d:/Important Documents")},
-                {Configuration.UploadPhotos,    new BackupConfig("copy", "d:/Photos",                   "GDrive:Photos")},
-                {Configuration.SyncPhotos,      new BackupConfig("sync", "GDrive:Photos",               "Azure:photos")}
-        };
-
-        public IEnumerable<BackupConfig> GetBackupConfigs()
-        {
-            foreach (Configuration val in Enum.GetValues(typeof(Configuration)))
-            {
-                if (BackupsToRun.HasFlag(val))
-                {
-                    yield return configs[val];
-                }
-            }
-        }
-
-        [Option('d', "debug")]
-        public bool Debug { get; set; }
-
-        [Option("should-download-rclone")]
-        public bool ShouldDownloadRclone { get; set; }
-
-        private string? rcloneConfig;
-        [Option("rclone-config")]
-        public string RcloneConfig
-        {
-            get => rcloneConfig ?? Path.Join(Environment.GetEnvironmentVariable("APPDATA"), "rclone", "rclone.conf");
-            set { rcloneConfig = value; }
-        }
-
-        private string? rclonePath;
-        [Option("rclone-path")]
-        public string RclonePath
-        {
-            get => rclonePath ?? Path.Join(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName), "rclone.exe");
-            set { rclonePath = value; }
-        }
-
-        [Option("backups-to-run", Required = true)]
-        public Configuration BackupsToRun { get; set; }
-    }
-
-    public class ManualBackup
-    {
-        public static void Main(string[] args)
-        {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(o => { var run = new ManualBackupRun(o); run.Run(); });
+            var app = new CommandApp<BackupGDrive.BackupCommand>();
+            return app.Run(args);
         }
     }
-
-    class ManualBackupRun
+    internal sealed class BackupCommand : Command<BackupCommand.Settings>
     {
-        private readonly Options options;
-        public ManualBackupRun(in Options options)
+        public sealed class Settings : CommandSettings
         {
-            this.options = options ?? throw new ArgumentNullException(nameof(options));
-        }
+            [CommandArgument(0, "<backup>")]
+            public string Backup { get; init; }
 
-        private void Debug(string msg)
-        {
-            if (options.Debug)
+            [CommandOption("-d|--debug")]
+            [DefaultValue(false)]
+            public bool Debug { get; init; }
+
+            [CommandOption("-s|--should-download-rclone")]
+            [DefaultValue(false)]
+            public bool ShouldDownloadRclone { get; init; }
+
+            private string? rcloneConfig;
+            [CommandOption("-c|--rclone-config")]
+            public string RcloneConfig
             {
-                AnsiConsole.Markup(msg);
+                get => rcloneConfig ?? Path.Join(Environment.GetEnvironmentVariable("APPDATA"), "rclone", "rclone.conf");
+                init { rcloneConfig = value; }
+            }
+
+            private string? rclonePath;
+            [CommandOption("-p|--rclone-path")]
+            public string RclonePath
+            {
+                get => rclonePath ?? Path.Join(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName), "rclone.exe");
+                init { rclonePath = value; }
+            }
+
+            // TODO: move to a config file.
+            public record BackupConfig(string Action, string Source, string Destination);
+            public readonly IReadOnlyDictionary<string, BackupConfig> configs = new Dictionary<string, BackupConfig> {
+                    {"syncdocs",        new BackupConfig("sync", "GDrive:Important Documents",  "Azure:importantdocuments")},
+                    {"localcopydocs",   new BackupConfig("sync", "GDrive:Important Documents",  "d:/Important Documents")},
+                    {"uploadphotos",    new BackupConfig("copy", "d:/Photos",                   "GDrive:Photos")},
+                    {"syncphotos",      new BackupConfig("sync", "GDrive:Photos",               "Azure:photos")}
+            };
+
+            public override ValidationResult Validate()
+            {
+                return configs.ContainsKey(Backup) ?
+                    ValidationResult.Success() :
+                    ValidationResult.Error($"Invalid backup type: {Backup}. Valid values: {String.Join(", ", configs.Keys)}");
             }
         }
-
-        public void Run()
+        public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
         {
-            Debug($"[underline red]Hello World![/] {options.RclonePath}{options.RcloneConfig}");
-            foreach (var config in options.GetBackupConfigs())
-            {
-                Debug(config.ToString());
-            }
+            AnsiConsole.MarkupLine(settings.ToString());
+            return 0;
         }
     }
 }
