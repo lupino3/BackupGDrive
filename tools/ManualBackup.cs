@@ -61,9 +61,28 @@ namespace BackupGDrive
 
             public override ValidationResult Validate()
             {
-                return configs.ContainsKey(Backup) ?
-                    ValidationResult.Success() :
-                    ValidationResult.Error($"Invalid backup type: {Backup}. Valid values: {String.Join(", ", configs.Keys)}");
+                var errors = new List<string>();
+                if (!configs.ContainsKey(Backup))
+                {
+                    errors.Add($"Invalid backup type: {Backup}. Valid values: {String.Join(", ", configs.Keys)}");
+                }
+
+                if (!File.Exists(RcloneConfig))
+                {
+                    errors.Add($"The rclone config file ({RcloneConfig}) does not exist.");
+                }
+
+                if (!ShouldDownloadRclone && !File.Exists(RclonePath))
+                {
+                    errors.Add($"The rclone executable ({RclonePath}) could not be found, and the ShouldDownloadRclone option is not set.");
+                }
+
+                if (errors.Any())
+                {
+                    return ValidationResult.Error(String.Join('\n', errors));
+                }
+
+                return ValidationResult.Success();
             }
         }
         public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
