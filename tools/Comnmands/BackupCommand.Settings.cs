@@ -74,6 +74,11 @@ namespace BackupGDrive.CLI.Commands
 
                 return ValidationResult.Success();
             }
+
+            public override string ToString()
+            {
+                return $"backup: {Backup}\n-d: {Debug}\n-s: {ShouldDownloadRclone}\n-p: {RclonePath}\n-c: {RcloneConfig}";
+            }
         }
     }
 }
