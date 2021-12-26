@@ -1,27 +1,22 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [Parameter(HelpMessage="Set to true to back up photos, false will back up documents only.")]
-    [switch]$BackupPhotos = $false,
-
     [Parameter(HelpMessage="Path to the rclone binary (including the file name). E.g.: 'c:\rclone.exe'.")]
     [ValidateNotNullOrEmpty()]
     [string] $RclonePath = "$PSScriptRoot\rclone.exe",
 
     [Parameter(HelpMessage="Path to the rclone config file")]
     [ValidateNotNullOrEmpty()]
-    [string] $RcloneConfig = "$env:APPDATA\rclone\rclone.conf",
+    [string] $RCloneConfig = "$env:APPDATA\rclone\rclone.conf",
 
     [Parameter(HelpMessage="Set to true if rclone should be downloaded if missing")]
-    [switch]
-    $ShouldDownloadRclone = $false,
+    [switch] $ShouldDownloadRclone,
 
     [Parameter(HelpMessage="List of backup jobs to run. Possible values: syncdocs, localcopydocs, uploadphotos, syncphotos")]
-    [string[]]
-    $BackupsToRun = @("syncdocs"),
+    [string[]] $BackupsToRun = @("syncdocs"),
 
     # Rclone options.
-    [int]$RcloneCheckers = 5,
-    [int]$RcloneTransfers = 5
+    [Parameter()] [int]$RcloneCheckers = 5,
+    [Parameter()] [int]$RcloneTransfers = 5
 )
 $ErrorActionPreference = "stop"
 
@@ -30,7 +25,7 @@ $backups = @{
     "syncdocs" = [pscustomobject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="Azure:importantdocuments"; Categories=@("documents","cloud")};
     "localcopydocs" = [PSCustomObject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="d:\Important Documents"; Category=@("documents","tolocal")};
     # Copy from d:\Photos to cloud storage because there are more photos online than locally.
-    "uploadphotos" = [PSCustomObject]@{Action="copy"; Source="d:\Photos"; Destination="GDrive:Photos"; Categories=@("photos","fromlocal")};
+    "uploadphotos" = [PSCustomObject]@{Action="copy"; Source="e:\Photos"; Destination="GDrive:Photos"; Categories=@("photos","fromlocal")};
     "syncphotos" = [PSCustomObject]@{Action="sync"; Source="GDrive:Photos"; Destination="Azure:Photos"; Categories=@("photos","cloud")};
 }
 # Validate command line options.
