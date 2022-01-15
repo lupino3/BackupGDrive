@@ -4,9 +4,9 @@ param(
     [ValidateNotNullOrEmpty()]
     [string] $RclonePath = "$PSScriptRoot\rclone.exe",
 
-    [Parameter(HelpMessage="Path to the rclone config file")]
+    [Parameter(HelpMessage="Paths where to search the rclone config file (rclone.conf)")]
     [ValidateNotNullOrEmpty()]
-    [string] $RCloneConfig = "$env:APPDATA\rclone\rclone.conf",
+    [string[]] $RCloneConfigSearchPath = @(".", "$env:userprofile\.config\rclone", "$env:APPDATA\rclone"),
 
     [Parameter(HelpMessage="Set to true if rclone should be downloaded if missing")]
     [switch] $ShouldDownloadRclone,
@@ -22,11 +22,10 @@ $ErrorActionPreference = "stop"
 
 # TODO: move to config file.
 $backups = @{
-    "syncdocs" = [pscustomobject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="Azure:importantdocuments"; Categories=@("documents","cloud")};
-    "localcopydocs" = [PSCustomObject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="d:\Important Documents"; Category=@("documents","tolocal")};
-    # Copy from d:\Photos to cloud storage because there are more photos online than locally.
-    "uploadphotos" = [PSCustomObject]@{Action="copy"; Source="e:\Photos"; Destination="GDrive:Photos"; Categories=@("photos","fromlocal")};
-    "syncphotos" = [PSCustomObject]@{Action="sync"; Source="GDrive:Photos"; Destination="Azure:Photos"; Categories=@("photos","cloud")};
+    "syncdocs" = [pscustomobject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="Azure:importantdocuments"};
+    "localcopydocs" = [PSCustomObject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="f:\Important Documents"};
+    "uploadphotos" = [PSCustomObject]@{Action="copy"; Source="e:\Photos"; Destination="GDrive:Photos"}; # Copy from d:\Photos to cloud storage because there are more photos online than locally.
+    "syncphotos" = [PSCustomObject]@{Action="sync"; Source="GDrive:Photos"; Destination="Azure:Photos"};
 }
 # Validate command line options.
 $invalidBackups = $BackupsToRun | ? {-not $backups.Contains($_)}
@@ -38,9 +37,20 @@ if ($invalidBackups.Count -gt 0) {
 $toRun = $backups.keys | ? {$BackupsToRun -contains $_}
 Write-Debug "Will run $toRun backups."
 
+$RcloneConfig = ""
+$found = $false
+foreach($path in $RCloneConfigSearchPath) {
+    $RcloneConfig = "$path\rclone.conf"
+    Write-Debug "Trying $RcloneConfig"
+    if (Test-Path $RcloneConfig) {
+        $found = $true
+        break
+    }
+}
+
 # Validation and setup
-if (-not (Test-Path $RCloneConfig)) {
-    Write-Error "Could not find the RClone config at $RCloneConfig"
+if (-not $found) {
+    Write-Error "Could not find the RClone config in $RCloneConfigSearchpath"
     exit
 }
 if (-not (Test-Path $RClonePath)) {
