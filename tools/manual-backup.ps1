@@ -35,13 +35,13 @@ begin {
         "syncphotos" = [PSCustomObject]@{Action="sync"; Source="GDrive:Photos"; Destination="Azure:Photos"};
     }
     # Validate command line options.
-    $invalidBackups = $BackupsToRun | ? {-not $backups.Contains($_)}
+    $invalidBackups = $BackupsToRun | Where-Object {-not $backups.Contains($_)}
     if ($invalidBackups.Count -gt 0) {
         Write-Error "Invalid backup names: $InvalidBackups." 
         exit
     }
 
-    $toRun = $backups.keys | ? {$BackupsToRun -contains $_}
+    $toRun = $backups.keys | Where-Object {$BackupsToRun -contains $_}
     Write-Debug "Will run $toRun backups."
 
     $RcloneConfigPath = ""
@@ -89,19 +89,19 @@ begin {
     }
 
     # Common rclone parameters.
-    $rcloneParams = "-P --checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfigPath"
+    $rcloneParams = "--checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfigPath --stats=5s --stats-one-line -v"
 
     # TODO: get the necessary remotes from Source/Destination.
     $necessaryRemotes = @("Azure:", "GDrive:")
     $remotes = Invoke-Expression "$RClonePath listremotes $rcloneParams"
-    $ok = $true
-    $necessaryRemotes | % {
-        if (-not ($remotes -contains $_)) {
-            Write-Error "Could not find remote $_" -EA:Continue
-            $ok = $false
+    $missingRemote = $false
+    foreach ($remote in $necessaryRemotes) {
+        if (-not ($remotes -contains $remote)) {
+            Write-Error "Could not find remote $remote" -EA:Continue
+            $missingRemote = $false
         }
     }
-    if (-not $ok) {
+    if ($missingRemote) {
         exit
     }
 }
@@ -128,6 +128,6 @@ process {
 end {
     if ($tempFile) {
         Write-Debug "Removing $tempile"
-        rm $tempFile
+        Remove-Item $tempFile
     }
 }
