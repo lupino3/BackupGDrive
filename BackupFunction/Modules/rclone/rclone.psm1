@@ -90,7 +90,7 @@ function Invoke-Rclone {
         }
 
         # Common rclone parameters.
-        $rcloneParams = "--checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfigPath --stats=5s --stats-one-line -v"
+        $rcloneParams = "--checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfigPath --stats=1s --stats-one-line -v"
 
         # TODO: get the necessary remotes from Source/Destination.
         $necessaryRemotes = @("Azure:", "GDrive:")
@@ -116,7 +116,7 @@ function Invoke-Rclone {
 
             Write-Host "$spacer`n$msg`n$spacer"
 
-            $cmd = "$RClonePath $($backup.Action) '$($backup.Source)' '$($backup.Destination)' $rcloneParams"
+            $cmd = ". {$RClonePath $($backup.Action) '$($backup.Source)' '$($backup.Destination)' $rcloneParams} 2>&1"
             Write-Host $cmd
             if ($PSCmdlet.ShouldProcess($cmd)) {
                 Invoke-Expression $cmd
