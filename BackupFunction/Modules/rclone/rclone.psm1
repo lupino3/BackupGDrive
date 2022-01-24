@@ -21,6 +21,9 @@ function Invoke-Rclone {
         [Parameter(HelpMessage="List of backup jobs to run. Possible values: syncdocs, localcopydocs, uploadphotos, syncphotos")]
         [string[]] $BackupsToRun = @("syncdocs"),
 
+        [Parameter(HelpMessage="Set to true if the cmdlet is run in an interactive context")]
+        [switch] $Interactive,
+
         # Rclone options.
         [Parameter()] [int]$RcloneCheckers = 5,
         [Parameter()] [int]$RcloneTransfers = 5
@@ -90,7 +93,7 @@ function Invoke-Rclone {
         }
 
         # Common rclone parameters.
-        $rcloneParams = "--checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfigPath --stats=1s --stats-one-line -v"
+        $rcloneParams = "--checkers=$RcloneCheckers --transfers=$RcloneTransfers --config=$RcloneConfigPath "
 
         # TODO: get the necessary remotes from Source/Destination.
         $necessaryRemotes = @("Azure:", "GDrive:")
@@ -115,13 +118,26 @@ function Invoke-Rclone {
             $spacer = "-" * ($msg.Length)
 
             Write-Host "$spacer`n$msg`n$spacer"
+            
+            if ($Interactive) {
+                $rcloneParams += "-P"
+            } else {
+                $tmpLogFile = New-TemporaryFile
+                $rcloneParams += "--use-json-log --stats=5s -v --log-file=$tmpLogFile"
+            }
 
-            $cmd = ". {$RClonePath $($backup.Action) '$($backup.Source)' '$($backup.Destination)' $rcloneParams} 2>&1"
+            $cmd = "$RClonePath $($backup.Action) '$($backup.Source)' '$($backup.Destination)' $rcloneParams"
             Write-Host $cmd
+            $rcloneExitCode = 0
             if ($PSCmdlet.ShouldProcess($cmd)) {
                 Invoke-Expression $cmd
+                $rcloneExitCode = $LASTEXITCODE
             }
-            if ($LASTEXITCODE -ne 0) {
+            if (-not $Interactive) {
+                Get-Content $tmpLogFile | Write-Host
+                Remove-Item $tmpLogFile
+            }
+            if ($rcloneExitCode -ne 0) {
                 Write-Error "There was an error (code $LASTEXITCODE) when doing the transfer. Check the rclone log for more info."
             }
         }

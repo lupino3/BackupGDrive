@@ -15,4 +15,4 @@ if ($Timer.IsPastDue) {
 # Write an information log with the current time.
 Write-Host "PowerShell timer trigger function ran! TIME: $currentUTCtime"
 
-Invoke-Rclone -ShouldDownloadRclone -BackupsToRun syncdocs -RcloneConfigEnvVariableName RCLONE_CONFIG_CONTENTS
+Invoke-Rclone -ShouldDownloadRclone -BackupsToRun syncdocs -RcloneConfigEnvVariableName RCLONE_CONFIG_CONTENTS -Interactive:$false
