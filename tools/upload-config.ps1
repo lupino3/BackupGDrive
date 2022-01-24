@@ -15,6 +15,7 @@ $cfgString = [Convert]::ToBase64String($cfgString)
 if ($Local) 
 {
     Write-Host "`"$VariableName`": `"$cfgString`""
+    Write-Host "`$env:$VariableName=`"$cfgString`""
 } 
 else 
 {
