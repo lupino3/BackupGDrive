@@ -1,7 +1,9 @@
 name: Deploy to Azure Functions
 
 on:
-  [push]
+  push:
+    branches:
+      - master
 
 env:
   AZURE_FUNCTIONAPP_NAME: BackupSync
