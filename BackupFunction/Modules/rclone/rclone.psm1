@@ -85,10 +85,15 @@ function Invoke-Rclone {
                 exit
             }
             $RcloneUri = "https://downloads.rclone.org/rclone-current-windows-amd64.zip" 
+            # Use a temporary directory for the script inside $env:TMP to download the rclone binary.
+            # Create the directory (if it doesn't exist)
+            $tmpDir = "$env:TMP\rclone"
+            mkdir $tmpDir -ErrorAction SilentlyContinue | Out-Null
+            Remove-Item $tmpDir\* -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
             Write-Output "Could not find the RClone binary at $RClonePath. Downloading it as requested, from $RcloneUri"
-            Invoke-WebRequest -Uri $RcloneUri -OutFile $env:TMP\rclone.zip
-            Expand-Archive -Force $env:TMP\rclone.zip -DestinationPath $env:TMP
-            $RclonePath = Get-ChildItem -Path $env:TMP\rclone-v*-windows-amd64\rclone.exe
+            Invoke-WebRequest -Uri $RcloneUri -OutFile $tmpDir\rclone.zip
+            Expand-Archive -Force $tmpDir\rclone.zip -DestinationPath $tmpDir
+            $RclonePath = Get-ChildItem -Path $tmpDir\rclone-v*-windows-amd64\rclone.exe
             Write-Debug "Overriding Rclone path to $RclonePath"
         }
 
