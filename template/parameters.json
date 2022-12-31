@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "value": "6c1f281f-979b-46e0-9daa-f74ef776ce85"
+        },
+        "name": {
+            "value": "BackupService"
+        },
+        "location": {
+            "value": "West Europe"
+        },
+        "hostingPlanName": {
+            "value": "ASP-backup-82f4"
+        },
+        "serverFarmResourceGroup": {
+            "value": "backup"
+        },
+        "alwaysOn": {
+            "value": false
+        },
+        "ftpsState": {
+            "value": "FtpsOnly"
+        },
+        "storageAccountName": {
+            "value": "backupservicestorage"
+        },
+        "sku": {
+            "value": "Dynamic"
+        },
+        "skuCode": {
+            "value": "Y1"
+        },
+        "workerSize": {
+            "value": "0"
+        },
+        "workerSizeId": {
+            "value": "0"
+        },
+        "numberOfWorkers": {
+            "value": "1"
+        },
+        "use32BitWorkerProcess": {
+            "value": true
+        },
+        "powerShellVersion": {
+            "value": "7.2"
+        },
+        "netFrameworkVersion": {
+            "value": "v6.0"
+        },
+        "repoUrl": {
+            "value": "https://github.com/lupino3/BackupGDrive"
+        },
+        "branch": {
+            "value": "master"
+        }
+    }
+}
