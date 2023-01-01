@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  AZURE_FUNCTIONAPP_NAME: BackupSync
+  AZURE_FUNCTIONAPP_NAME: BackupService
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'BackupFunction'    # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '2.2.402'              # set this to the dotnet version to use
 
