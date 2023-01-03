@@ -1,0 +1,541 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 15,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "ZBCE-Jt4k"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 10,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failure"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Success"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 22,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "azureLogAnalytics": {
+            "query": "requests\r\n| where $__timeFilter(timestamp)\r\n| where success == True\r\n| project timestamp, Success=duration, operation_Name\r\n| order by timestamp asc",
+            "resource": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backupservice",
+            "resultFormat": "time_series"
+          },
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "dimensionFilters": [],
+            "metricNamespace": "microsoft.insights/components",
+            "resourceGroup": "backup",
+            "resourceName": "backupservice",
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "ZBCE-Jt4k"
+          },
+          "key": "Q-4f6bde64-4c81-4ca5-94cf-f584f85e4ae2-0",
+          "queryType": "Azure Log Analytics",
+          "refId": "Successful Runs",
+          "subscription": "6c1f281f-979b-46e0-9daa-f74ef776ce85"
+        },
+        {
+          "azureLogAnalytics": {
+            "query": "requests\r\n| where $__timeFilter(timestamp)\r\n| where success == False\r\n| project timestamp, Failure=duration, operation_Name\r\n| order by timestamp asc",
+            "resource": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backupservice",
+            "resultFormat": "time_series"
+          },
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "ZBCE-Jt4k"
+          },
+          "hide": false,
+          "key": "Q-0ef7d5f8-4226-4df7-9275-dce6768f78a0-1",
+          "queryType": "Azure Log Analytics",
+          "refId": "Failed Runs"
+        }
+      ],
+      "title": "Status and duration of Backup Runs",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "ZBCE-Jt4k"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timestamp"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 167
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 22,
+        "x": 0,
+        "y": 14
+      },
+      "id": 3,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "timestamp"
+          }
+        ]
+      },
+      "pluginVersion": "9.3.2-45365",
+      "targets": [
+        {
+          "azureLogAnalytics": {
+            "query": "traces\r\n| where $__timeFilter(timestamp)\r\n| where severityLevel > 1 \r\n| project timestamp, Severity=severityLevel, Type=operation_Name, Id=operation_Id, Message=message",
+            "resource": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backupservice",
+            "resultFormat": "table"
+          },
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "ZBCE-Jt4k"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Logs",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "ZBCE-Jt4k"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timestamp"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 167
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "object"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 315
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 22,
+        "x": 0,
+        "y": 20
+      },
+      "id": 4,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "timestamp"
+          }
+        ]
+      },
+      "pluginVersion": "9.3.2-45365",
+      "targets": [
+        {
+          "azureLogAnalytics": {
+            "query": "traces\r\n| where isnotempty(operation_Name)\r\n| where $__timeFilter(timestamp)\r\n| where message contains \": {\"\r\n| project timestamp, operation_Name, message=todynamic(substring(message, 13))\r\n| evaluate bag_unpack(message, \"rclone_\")\r\n| where rclone_level != \"info\"\r\n| project timestamp=rclone_time, Operation=operation_Name, level=rclone_level, message=rclone_msg, object=rclone_object, objectType=rclone_objectType\r\n",
+            "resource": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backupservice",
+            "resultFormat": "table"
+          },
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "ZBCE-Jt4k"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A"
+        }
+      ],
+      "title": "RClone warning/error logs",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "ZBCE-Jt4k"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "stats_bytes {operation_Name=\"DocumentsHourly\", rclone_object=\"\", rclone_objectType=\"\", stats_fatalError=\"false\", stats_retryError=\"false\", stats_speed=\"25080.321968002583\"}"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 410
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 22,
+        "x": 0,
+        "y": 30
+      },
+      "id": 6,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "9.3.2-45365",
+      "targets": [
+        {
+          "azureLogAnalytics": {
+            "query": "traces\r\n| where $__timeFilter(timestamp)\r\n| where isnotempty(operation_Name)\r\n| where message contains \": {\"\r\n| project timestamp, operation_Name, operation_Id, message=todynamic(substring(message, 13))\r\n| evaluate bag_unpack(message, \"rclone_\")\r\n| where isnotempty(rclone_stats)\r\n| evaluate bag_unpack(todynamic(rclone_stats), \"stats_\")\r\n| summarize arg_max(rclone_time, *) by operation_Id, operation_Name\r\n| project-away timestamp, rclone_msg, rclone_level, stats_transferring, rclone_source, stats_eta, stats_transferTime",
+            "resource": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backupservice",
+            "resultFormat": "table"
+          },
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "ZBCE-Jt4k"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A"
+        }
+      ],
+      "title": "Backup Run Statistics",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "rclone_object": true,
+              "rclone_objectType": true,
+              "stats_totalChecks": true,
+              "stats_totalTransfers": true
+            },
+            "indexByName": {
+              "operation_Id": 2,
+              "operation_Name": 1,
+              "rclone_object": 15,
+              "rclone_objectType": 18,
+              "rclone_time": 0,
+              "stats_bytes": 5,
+              "stats_checks": 3,
+              "stats_deletedDirs": 6,
+              "stats_deletes": 7,
+              "stats_elapsedTime": 8,
+              "stats_errors": 9,
+              "stats_fatalError": 11,
+              "stats_renames": 12,
+              "stats_retryError": 13,
+              "stats_speed": 10,
+              "stats_totalBytes": 14,
+              "stats_totalChecks": 16,
+              "stats_totalTransfers": 17,
+              "stats_transfers": 4
+            },
+            "renameByName": {
+              "operation_Id": "Id",
+              "operation_Name": "Operation",
+              "rclone_object": "",
+              "rclone_time": "timestamp",
+              "stats_bytes": "Bytes",
+              "stats_checks": "Checks",
+              "stats_deletedDirs": "Deleted Dirs",
+              "stats_deletes": "Deletes",
+              "stats_elapsedTime": "Elapsed Time (s)",
+              "stats_errors": "Errors",
+              "stats_fatalError": "Fatal Error",
+              "stats_renames": "Renames",
+              "stats_retryError": "Retry Error",
+              "stats_speed": "Speed",
+              "stats_totalBytes": "Total Bytes",
+              "stats_transfers": "Transfers"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Backup",
+  "uid": "aEgi3PtVz",
+  "version": 23,
+  "weekStart": ""
+}
