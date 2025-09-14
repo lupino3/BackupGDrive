@@ -3,6 +3,7 @@ bin
 obj
 appsettings.json
 local.settings.json
+functionapp.zip
 
 # rclone binary and config
 rclone.exe

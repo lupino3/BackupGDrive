@@ -1,3 +1,8 @@
+# Upload-config helper
+# See docs/SETUP.md and docs/USAGE.md for details on how rclone config is encoded and uploaded to Function App settings.
+# Set Local to true to print the command to set the environment variable locally instead of uploading to Azure.
+# Usage: .\upload-config.ps1 -ConfigFile .\rclone.conf -Local $true
+
 param(
     [string] $ResourceGroup,
     [string] $AppName,

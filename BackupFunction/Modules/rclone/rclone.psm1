@@ -34,8 +34,8 @@ function Invoke-Rclone {
         # TODO: move to config file.
         $backups = @{
             "syncdocs" = [pscustomobject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="Azure:importantdocuments"};
-            "localcopydocs" = [PSCustomObject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="f:\Important Documents"};
-            "uploadphotos" = [PSCustomObject]@{Action="copy"; Source="f:\Photos"; Destination="GDrive:Photos"}; # Copy from d:\Photos to cloud storage because there are more photos online than locally.
+            "localcopydocs" = [PSCustomObject]@{Action="sync"; Source="GDrive:Important Documents"; Destination="h:\Important Documents"};
+            "uploadphotos" = [PSCustomObject]@{Action="copy"; Source="h:\Photos"; Destination="GDrive:Photos"}; # Copy from d:\Photos to cloud storage because there are more photos online than locally.
             "syncphotos" = [PSCustomObject]@{Action="sync"; Source="GDrive:Photos"; Destination="Azure:photos"};
         }
         # Validate command line options.

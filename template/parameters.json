@@ -45,10 +45,10 @@
             "value": true
         },
         "powerShellVersion": {
-            "value": "7.2"
+            "value": "7.4"
         },
         "netFrameworkVersion": {
-            "value": "v6.0"
+            "value": "v8.0"
         },
         "repoUrl": {
             "value": "https://github.com/lupino3/BackupGDrive"
