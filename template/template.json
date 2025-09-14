@@ -55,6 +55,13 @@
         },
         "branch": {
             "type": "string"
+        },
+        "enableSourceControlIntegration": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Set to true to create/refresh the sourcecontrols (GitHub) integration. Leave false to avoid UpdateSiteSourceControl errors."
+            }
         }
     },
     "variables": {},
@@ -66,7 +73,9 @@
             "kind": "functionapp",
             "location": "[parameters('location')]",
             "tags": {
-                "hidden-link: /app-insights-resource-id": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backup"
+                "hidden-link: /app-insights-resource-id": "/subscriptions/6c1f281f-979b-46e0-9daa-f74ef776ce85/resourceGroups/backup/providers/microsoft.insights/components/backupservice",
+                "hidden-link: /app-insights-instrumentation-key": "a3a3e136-b24e-433e-97fc-6f878702e7c3",
+                "hidden-link: /app-insights-conn-string": "InstrumentationKey=a3a3e136-b24e-433e-97fc-6f878702e7c3;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=912362d7-b576-470e-85b5-5bb25400b660"
             },
             "dependsOn": [
                 "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
@@ -86,11 +95,11 @@
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "5d469aaf-d8b6-479e-bcce-eb9e4e6baa55"
+                            "value": "a3a3e136-b24e-433e-97fc-6f878702e7c3"
                         },
                         {
                             "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                            "value": "InstrumentationKey=5d469aaf-d8b6-479e-bcce-eb9e4e6baa55;IngestionEndpoint=https://westeurope-1.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/"
+                            "value": "InstrumentationKey=a3a3e136-b24e-433e-97fc-6f878702e7c3;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=912362d7-b576-470e-85b5-5bb25400b660"
                         },
                         {
                             "name": "AzureWebJobsStorage",
@@ -125,27 +134,14 @@
                     "type": "sourcecontrols",
                     "name": "web",
                     "apiVersion": "2020-12-01",
+                    "condition": "[parameters('enableSourceControlIntegration')]",
                     "properties": {
                         "RepoUrl": "[parameters('repoUrl')]",
                         "branch": "[parameters('branch')]",
                         "IsManualIntegration": false,
                         "deploymentRollbackEnabled": false,
                         "isMercurial": false,
-                        "isGitHubAction": true,
-                        "gitHubActionConfiguration": {
-                            "generateWorkflowFile": true,
-                            "workflowSettings": {
-                                "appType": "functionapp",
-                                "publishType": "code",
-                                "os": "windows",
-                                "runtimeStack": "powershell",
-                                "workflowApiVersion": "2020-12-01",
-                                "slotName": "production",
-                                "variables": {
-                                    "runtimeVersion": "7.2"
-                                }
-                            }
-                        }
+                        "isGitHubAction": false
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/Sites', parameters('name'))]"
@@ -205,7 +201,12 @@
                             "name": "DefaultWorkspace-6c1f281f-979b-46e0-9daa-f74ef776ce85-WEU",
                             "type": "Microsoft.OperationalInsights/workspaces",
                             "location": "West Europe",
-                            "properties": {}
+                            "properties": {
+                                "retentionInDays": 30,
+                                "sku": {
+                                    "name": "PerGB2018"
+                                }
+                            }
                         }
                     ]
                 }
